@@ -1,7 +1,7 @@
 public class Worker extends Thread{
 
-	private int id;
-	private Data data;
+	private final int id;
+	private final Data data;
 	
 	public Worker(int id, Data d){
 		this.id = id;
@@ -12,16 +12,18 @@ public class Worker extends Thread{
 	@Override
 	public void run(){
 		super.run();
-		for (int i=0;i<5;i++){
+		for (int i = 0; i < 5; i++){
 			synchronized (data) {
 				try {
 					while (id != data.getState()) {
 						data.wait();
 					}
 					if (id == 1) {
-						data.Tic();
-					} else {
 						data.Tak();
+					} else if (id == 2) {
+						data.Toi();
+					} else {
+						data.Tic();
 					}
 					data.notify();
 				} catch (InterruptedException e) {
