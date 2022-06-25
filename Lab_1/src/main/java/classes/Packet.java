@@ -17,7 +17,7 @@ public class Packet {
 
     public Packet(String messageString, int bSrcIncome, int cType, int bUserId) {
         try {
-            if (bSrcIncome > 255) throw new IllegalArgumentException("User id out of bounds exception");
+            if (bSrcIncome > 255) throw new IllegalArgumentException("App id out of bounds exception");
 
             Message message = new Message(messageString, cType, bUserId);
 
@@ -42,7 +42,7 @@ public class Packet {
             byteArrayOutputStream.write(byteBuffer.put(message.getBytes()).array());
 
             byteBuffer = ByteBuffer.allocate(4);
-            byteArrayOutputStream.write(byteBuffer.putInt(CRC16.fromArrayOfBytes(Arrays.copyOfRange(byteArrayOutputStream.toByteArray(), Structure.message_offset, Structure.message_offset + messageLength))).array());
+            byteArrayOutputStream.write(byteBuffer.putInt(CRC16.fromArrayOfBytes(Arrays.copyOfRange(byteArrayOutputStream.toByteArray(), Structure.cType_offset, Structure.cType_offset + messageLength))).array());
 
             bytes = byteArrayOutputStream.toByteArray();
             bPktId++;
