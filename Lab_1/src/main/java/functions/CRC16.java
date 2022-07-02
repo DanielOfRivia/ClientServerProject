@@ -1,13 +1,13 @@
 package functions;
 
-import org.json.JSONObject;
+//import org.json.JSONObject;
 
 public class CRC16 {
 
     /** ========== Convert data of different types into crc16 ========== **/
 
-    public static int fromJSONObject(JSONObject jsonObject) {
-        return fromArrayOfBytes(jsonObject.toString().getBytes());
+    public static int fromJSONObject(/*JSONObject jsonObject*/ String mes) {
+        return fromArrayOfBytes(/*jsonObject.toString().getBytes()*/ mes.getBytes());
     }
 
     public static int fromString(String string) {

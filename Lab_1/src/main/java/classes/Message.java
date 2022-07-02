@@ -27,4 +27,15 @@ public class Message {
 
         return byteBuffer.hasArray() ? byteBuffer.array() : null;
     }
+
+    public String getInfo(){
+        return info;
+    }
+
+    public int getcType(){
+        return cType;
+    }
+    public int getbUserId(){
+        return bUserId;
+    }
 }

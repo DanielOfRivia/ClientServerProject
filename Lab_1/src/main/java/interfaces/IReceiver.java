@@ -1,3 +1,5 @@
 package interfaces;
 
-public interface IReceiver {}
+public interface IReceiver {
+    void receiveMessage();
+}

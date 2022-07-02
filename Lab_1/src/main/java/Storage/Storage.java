@@ -1,102 +1,89 @@
 package Storage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 public class Storage {
-    private static HashMap<String, ArrayList<String>> groups = new HashMap<>();
-    private static HashMap<String, int[]> items = new HashMap<>();//1 - amount, 2 - price
+    public enum command_types {
+        GET_ITEM_NUMBER,
+        DELETE_ITEM,
+        ADD_ITEM,
+        ADD_GROUP,
+        ADD_ITEM_TO_GROUP,
+        SET_ITEM_PRICE,
+        EXCEPTION_FROM_SERVER
+    }
+    private final ConcurrentHashMap<String, ArrayList<Item>> items_storage;
     public Storage(){
-        groups.put("drinks", new ArrayList<String>());
-        items.put("milk", new int[2]);
-        groups.get("drinks").add("milk");
-        items.get("milk")[0] = 20;
-        items.get("milk")[1] = 30;
+        items_storage = new ConcurrentHashMap<>();
     }
 
-    public int number_of_items(String name) throws Exception{
-        System.out.println("number_of_items " + name);
-        try {
-            return items.get(name)[0];
-        }catch (Exception e){
-            throw new Exception("No items with this name");
+    public AtomicInteger number_of_items(String name) throws Exception{
+        for(ArrayList<Item> arr : items_storage.values()){
+            for(Item item : arr){
+                if(item.getName().equals(name)){
+                    return item.getNumber();
+                }
+            }
         }
-
+        throw new Exception("No items with name \"" + name + "\"" );
     }
 
     public void delete_items_number (String name, int number) throws Exception{
-        int [] new_arr;
-        try {
-            new_arr = items.get(name);
-        } catch (Exception e){
-            throw new Exception("No items with this name");
+        for(ArrayList<Item> arr : items_storage.values()){
+            for(Item item : arr){
+                if(item.getName().equals(name)){
+                    item.getNumber().addAndGet(-number);
+                }
+            }
         }
-        if(new_arr[0] < number){
-            throw new Exception("Not enough items in storage");
-        }else {
-            new_arr[0] = new_arr[0] - number;
-            System.out.println(new_arr[0]);
-            items.put(name, new_arr);
-            System.out.println(items.get(name)[0]);
-        }
-        System.out.println("delete_items_number " + name + ", " + number);
-        print_info();
+        throw new Exception("No items with name \"" + name + "\"" );
     }
 
     public void add_items_number (String name, int number) throws Exception{
-        int [] new_arr;
-        try {
-            new_arr = items.get(name);
-        } catch (Exception e){
-            throw new Exception("No items with this name");
+        for(ArrayList<Item> arr : items_storage.values()){
+            for(Item item : arr){
+                if(item.getName().equals(name)){
+                    item.getNumber().addAndGet(number);
+                }
+            }
         }
-        new_arr[0] += number;
-        items.put(name, new_arr);
-        System.out.println("add_items_number " + name + ", " + number);
-
+        throw new Exception("No items with name \"" + name + "\"" );
     }
 
-    public void add_group (String name) throws Exception{
-        groups.put(name, new ArrayList<String>());
-        System.out.println("add_group " + name);
+    public void add_group (String name){
+        items_storage.put(name, new ArrayList<>());
     }
 
-    public void add_item_to_group (String item_name, String group_name) throws Exception{
-        try {
-            (groups.get(group_name)).add(item_name);
-        } catch (Exception e){
-            throw new Exception("No group with this name");
-        }
-        items.put(item_name, new int[2]);
-        System.out.println("add_item_to_group " + item_name + ", " + group_name);
-
+    public void add_item_to_group (String item_name, String group_name){
+        (items_storage.get(group_name)).add(new Item(item_name));
     }
 
     public void set_price(String name, int new_price) throws Exception{
-        int [] new_arr;
-        try {
-            new_arr = items.get(name);
-        } catch (Exception e){
-            throw new Exception("No items with this name");
+        for(ArrayList<Item> arr : items_storage.values()){
+            for(Item item : arr){
+                if(item.getName().equals(name)){
+                    item.getPrice().set(new_price);
+                }
+            }
         }
-        new_arr[1] = new_price;
-        items.put(name, new_arr);
-        System.out.println("set_price " + name + ", " + new_price);
+        throw new Exception("No items with name \"" + name + "\"" );
 
     }
 
     public void print_info(){
-        System.out.println("Groups: ");
-        for (String i : groups.keySet()) {
-            System.out.print(i + " - ");
-            for(int k = 0; k < groups.get(i).size(); k++){
-                System.out.print(groups.get(i).get(k) + ", ");
+        for (String i : items_storage.keySet()) {
+            System.out.println("Group: " + i);
+            for (Item item : items_storage.get(i)){
+                System.out.print("   ");
+                System.out.println("name: " + item.getName());
+                System.out.print("   ");
+                System.out.println("price: " + item.getPrice().toString());
+                System.out.print("   ");
+                System.out.println("number of items: " + item.getNumber().toString());
+                System.out.println();
             }
             System.out.println();
-        }
-        System.out.println("Items: ");
-        for (String i : items.keySet()) {
-            System.out.println(i + ", number of items - " + items.get(i)[0] + ", price - " + items.get(i)[1]);
         }
     }
 }
